@@ -49,6 +49,7 @@ fun PersonalDataActivity(navController: NavController) {
 @Composable
 fun PersonalPortraitLayout() {
     Text("Hola mundo portrait!!")
+
 }
 
 @Composable
