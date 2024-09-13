@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.labscm20242_gr03.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +51,8 @@ fun PersonalDataActivity(navController: NavController) {
                     inputText = inputText,
                     onInputChanges = { inputText = it },
                     selectedGender = selectedGender,
-                    onGenderChange = { selectedGender = it }
+                    onGenderChange = { selectedGender = it },
+                    navController = navController
                 )
             } else {
                 PersonalLandscapeLayout()
@@ -64,7 +66,8 @@ fun PersonalPortraitLayout(
     inputText: String,
     onInputChanges: (String) -> Unit,
     selectedGender: String,
-    onGenderChange: (String) -> Unit
+    onGenderChange: (String) -> Unit,
+    navController: NavController
 ) {
     Column(
         modifier = Modifier
@@ -141,6 +144,16 @@ fun PersonalPortraitLayout(
                 onClick = { onGenderChange("Mujer") }
             )
             Text("Mujer")
+        }
+        Row ( Modifier
+            .fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ){
+            Button(onClick = {
+                navController.navigate(route = AppScreens.ContactDataActivity.route)
+            }) {
+                Text("Siguiente")
+            }
         }
     }
 }
