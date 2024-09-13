@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.labscm20242_gr03.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +63,8 @@ fun PersonalDataActivity(navController: NavController) {
                     lastNames = fullLastNames,
                     onLastNameHandleChange = { fullLastNames = it },
                     selectedGender = selectedGender,
-                    onGenderChange = { selectedGender = it }
+                    onGenderChange = { selectedGender = it },
+                    navController = navController
                 )
             } else {
                 PersonalLandscapeLayout()
@@ -79,6 +81,7 @@ fun PersonalPortraitLayout(
     onLastNameHandleChange: (String) -> Unit,
     selectedGender: String,
     onGenderChange: (String) -> Unit,
+    navController: NavController
 ) {
     Column(
         modifier = Modifier
@@ -179,6 +182,18 @@ fun PersonalPortraitLayout(
                     .padding(end = 6.dp)
                     .size(36.dp)
             )
+        }
+
+        Row (
+            Modifier
+                .fillMaxWidth(0.85f),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            Button(onClick = {
+                navController.navigate(route = AppScreens.ContactDataActivity.route)
+            }) {
+                Text("Siguiente")
+            }
         }
     }
 }
