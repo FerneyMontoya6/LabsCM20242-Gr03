@@ -1,30 +1,13 @@
 package com.example.labscm20242_gr03.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Email
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,6 +19,16 @@ import androidx.navigation.NavController
 fun ContactDataActivity(navController: NavController) {
     var inputPhone by remember { mutableStateOf("") }
     var inputEmail by remember { mutableStateOf("") }
+    var inputCountry by remember { mutableStateOf("") }
+
+    val latinAmericanCountries = listOf(
+        "Argentina", "Bolivia", "Brasil", "Chile", "Colombia", "Costa Rica",
+        "Cuba", "Dominicana", "Ecuador", "El Salvador", "Guatemala", "Honduras",
+        "México", "Nicaragua", "Panamá", "Paraguay", "Perú", "Puerto Rico",
+        "Uruguay", "Venezuela"
+    )
+
+    var countrySuggestions by remember { mutableStateOf(latinAmericanCountries) }
 
     Scaffold(
         topBar = {
@@ -55,35 +48,54 @@ fun ContactDataActivity(navController: NavController) {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            if (true) {
-                ContactPortraitLayout(
-                    inputPhone = inputPhone,
-                    onInputPhoneChanges = { newValue ->
-                        if (newValue.all { it.isDigit() }) {
-                            inputPhone = newValue
+            ContactPortraitLayout(
+                inputPhone = inputPhone,
+                onInputPhoneChanges = { newValue ->
+                    if (newValue.all { it.isDigit() }) {
+                        inputPhone = newValue
+                    }
+                },
+                inputEmail = inputEmail,
+                onInputEmailChanges = { newValue -> inputEmail = newValue },
+                inputCountry = inputCountry,
+                countrySuggestions = countrySuggestions,
+                onCountryChange = { newValue ->
+                    inputCountry = newValue
+                    countrySuggestions = if (newValue.isEmpty()) {
+                        latinAmericanCountries
+                    } else {
+                        latinAmericanCountries.filter {
+                            it.contains(newValue, ignoreCase = true)
                         }
-                    },
-                    inputEmail = inputEmail,
-                    onInputEmailChanges = { newValue -> inputEmail = newValue }
-                )
-            } else {
-                ContactLandscapeLayout()
-            }
+                    }
+                },
+                onCountrySuggestionClick = { country ->
+                    inputCountry = country
+                    countrySuggestions = emptyList()
+                }
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactPortraitLayout (
+fun ContactPortraitLayout(
     inputPhone: String,
     onInputPhoneChanges: (String) -> Unit,
     inputEmail: String,
-    onInputEmailChanges: (String) -> Unit
+    onInputEmailChanges: (String) -> Unit,
+    inputCountry: String,
+    countrySuggestions: List<String>,
+    onCountryChange: (String) -> Unit,
+    onCountrySuggestionClick: (String) -> Unit
 ) {
-    Column (
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(
         modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)
+            .fillMaxWidth()
+            .padding(16.dp)
     ) {
         Row(
             modifier = Modifier.padding(bottom = 20.dp),
@@ -122,10 +134,67 @@ fun ContactPortraitLayout (
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
         }
+
+        Column (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(bottom = 20.dp)
+                    .padding(end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Rounded.LocationOn,
+                    contentDescription = "Location icon",
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .size(36.dp)
+                )
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.TopStart)
+                ) {
+                    TextField(
+                        value = inputCountry,
+                        onValueChange = {
+                            onCountryChange(it)
+                            expanded = true
+                        },
+                        label = { Text("País") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded && countrySuggestions.isNotEmpty(),
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        countrySuggestions.forEach { suggestion ->
+                            DropdownMenuItem(
+                                text = { Text(suggestion) },
+                                onClick = {
+                                    onCountrySuggestionClick(suggestion)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun ContactLandscapeLayout () {
+fun ContactLandscapeLayout() {
     Text("Hola landscape")
 }
