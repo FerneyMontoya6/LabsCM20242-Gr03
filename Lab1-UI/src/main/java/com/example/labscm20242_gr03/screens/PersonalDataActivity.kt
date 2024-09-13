@@ -1,12 +1,18 @@
 package com.example.labscm20242_gr03.screens
 
 import android.content.res.Configuration
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,14 +21,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.labscm20242_gr03.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalDataActivity(navController: NavController) {
-    var inputText by rememberSaveable { mutableStateOf("") }
+    var fullNames by rememberSaveable { mutableStateOf("") }
+    var fullLastNames by rememberSaveable { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
 
     val configuration = LocalConfiguration.current
@@ -48,11 +57,12 @@ fun PersonalDataActivity(navController: NavController) {
         ) {
             if (isPortrait) {
                 PersonalPortraitLayout(
-                    inputText = inputText,
-                    onInputChanges = { inputText = it },
+                    fullNames = fullNames,
+                    onFullNameHandleChange = { fullNames = it },
+                    lastNames = fullLastNames,
+                    onLastNameHandleChange = { fullLastNames = it },
                     selectedGender = selectedGender,
-                    onGenderChange = { selectedGender = it },
-                    navController = navController
+                    onGenderChange = { selectedGender = it }
                 )
             } else {
                 PersonalLandscapeLayout()
@@ -63,11 +73,12 @@ fun PersonalDataActivity(navController: NavController) {
 
 @Composable
 fun PersonalPortraitLayout(
-    inputText: String,
-    onInputChanges: (String) -> Unit,
+    fullNames: String,
+    onFullNameHandleChange: (String) -> Unit,
+    lastNames: String,
+    onLastNameHandleChange: (String) -> Unit,
     selectedGender: String,
     onGenderChange: (String) -> Unit,
-    navController: NavController
 ) {
     Column(
         modifier = Modifier
@@ -80,7 +91,7 @@ fun PersonalPortraitLayout(
                 Modifier
                     .fillMaxWidth(0.85f)
                     .padding(bottom = 10.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.Start,
             ) {
                 Text("Nombres")
             }
@@ -96,9 +107,14 @@ fun PersonalPortraitLayout(
                         .size(36.dp)
                 )
                 TextField(
-                    value = inputText,
-                    onValueChange = onInputChanges,
-                    label = { Text("Melissa") }
+                    value = fullNames,
+                    onValueChange = onFullNameHandleChange,
+                    label = { Text("Nombres") },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        keyboardType = KeyboardType.Text
+                    ),
+                    singleLine = true
                 )
             }
         }
@@ -115,9 +131,14 @@ fun PersonalPortraitLayout(
                     .size(36.dp)
             )
             TextField(
-                value = inputText,
-                onValueChange = onInputChanges,
-                label = { Text("Apellidos") }
+                value = lastNames,
+                onValueChange = onLastNameHandleChange,
+                label = { Text("Apellidos") },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    keyboardType = KeyboardType.Text
+                ),
+                singleLine = true
             )
         }
 
@@ -145,15 +166,19 @@ fun PersonalPortraitLayout(
             )
             Text("Mujer")
         }
-        Row ( Modifier
-            .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ){
-            Button(onClick = {
-                navController.navigate(route = AppScreens.ContactDataActivity.route)
-            }) {
-                Text("Siguiente")
-            }
+
+        // Fecha de nacimiento
+        Row(
+            modifier = Modifier.padding(bottom = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Rounded.DateRange,
+                contentDescription = "Date icon",
+                modifier = Modifier
+                    .padding(end = 6.dp)
+                    .size(36.dp)
+            )
         }
     }
 }
@@ -161,4 +186,39 @@ fun PersonalPortraitLayout(
 @Composable
 fun PersonalLandscapeLayout() {
     Text("Hola mundo landscape!!")
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerDialogInput(openDate: MutableState<Boolean>, fechaNacimiento:MutableState<String>){
+    if (openDate.value) {
+        val datePickerState = rememberDatePickerState()
+        val confirmEnabled = remember {
+            derivedStateOf { datePickerState.selectedDateMillis != null }
+        }
+        val formatter: SimpleDateFormat = SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS", java.util.Locale.getDefault())
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
+
+        DatePickerDialog(
+            onDismissRequest = {
+                openDate.value = false
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        openDate.value = false
+                        fechaNacimiento.value = formatter.format(datePickerState.selectedDateMillis)
+                    },
+                    enabled = confirmEnabled.value
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { openDate.value = false }) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+          }
+}
 }
