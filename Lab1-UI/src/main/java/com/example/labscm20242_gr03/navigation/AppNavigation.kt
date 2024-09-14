@@ -11,7 +11,7 @@ import com.example.labscm20242_gr03.screens.PersonalDataActivity
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = AppScreens.PersonalDataActivity.route) {
+    NavHost(navController = navController, startDestination = AppScreens.ContactDataActivity.route) {
         composable(route = AppScreens.PersonalDataActivity.route) {
             PersonalDataActivity(navController)
         }
