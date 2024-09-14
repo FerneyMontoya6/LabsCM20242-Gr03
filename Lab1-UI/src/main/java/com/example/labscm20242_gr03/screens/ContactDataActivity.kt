@@ -7,16 +7,16 @@ import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.LocationOn
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.labscm20242_gr03.navigation.AppScreens
+import com.example.labscm20242_gr03.services.CityViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +24,7 @@ fun ContactDataActivity(navController: NavController) {
     var inputPhone by remember { mutableStateOf("") }
     var inputEmail by remember { mutableStateOf("") }
     var inputCountry by remember { mutableStateOf("") }
+    var inputCity by remember { mutableStateOf("") }
     var inputAddress by remember { mutableStateOf("") }
 
     val latinAmericanCountries = listOf(
@@ -34,6 +35,17 @@ fun ContactDataActivity(navController: NavController) {
     )
 
     var countrySuggestions by remember { mutableStateOf(latinAmericanCountries) }
+
+    // Obtén el ViewModel
+    val cityViewModel: CityViewModel = viewModel()
+    val cities by cityViewModel.cities.collectAsState()
+
+    // Filtra las ciudades en base al inputCountry
+    val citySuggestions = remember(inputCity) {
+        cities.filter { city ->
+            city.name.contains(inputCity, ignoreCase = true)
+        }.map { it.name }
+    }
 
     Scaffold(
         topBar = {
@@ -78,6 +90,14 @@ fun ContactDataActivity(navController: NavController) {
                     inputCountry = country
                     countrySuggestions = emptyList()
                 },
+                inputCity = inputCity,
+                citySuggestions = citySuggestions, // Usa citySuggestions en lugar de countrySuggestions
+                onCityChange = { newValue ->
+                    inputCity = newValue
+                },
+                onCitySuggestionClick = { city ->
+                    inputCity = city
+                },
                 navController = navController,
                 inputAddress = inputAddress,
                 onAddressChange = { newValue -> inputAddress = newValue }
@@ -97,11 +117,16 @@ fun ContactPortraitLayout(
     countrySuggestions: List<String>,
     onCountryChange: (String) -> Unit,
     onCountrySuggestionClick: (String) -> Unit,
+    inputCity: String,
+    citySuggestions: List<String>,
+    onCityChange: (String) -> Unit,
+    onCitySuggestionClick: (String) -> Unit,
     navController: NavController,
     inputAddress: String,
     onAddressChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var countryExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -146,7 +171,8 @@ fun ContactPortraitLayout(
             )
         }
 
-        Column (
+        // Country
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 16.dp)
@@ -159,15 +185,15 @@ fun ContactPortraitLayout(
             ) {
                 Icon(
                     Icons.Rounded.LocationOn,
-                    contentDescription = "Location icon",
+                    contentDescription = "Country icon",
                     modifier = Modifier
                         .padding(end = 6.dp)
                         .size(36.dp)
                 )
 
                 ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded },
+                    expanded = countryExpanded,
+                    onExpandedChange = { countryExpanded = !countryExpanded },
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentSize(Alignment.TopStart)
@@ -176,7 +202,7 @@ fun ContactPortraitLayout(
                         value = inputCountry,
                         onValueChange = {
                             onCountryChange(it)
-                            expanded = true
+                            countryExpanded = true
                         },
                         label = { Text("País") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -186,15 +212,15 @@ fun ContactPortraitLayout(
                     )
 
                     ExposedDropdownMenu(
-                        expanded = expanded && countrySuggestions.isNotEmpty(),
-                        onDismissRequest = { expanded = false }
+                        expanded = countryExpanded && countrySuggestions.isNotEmpty(),
+                        onDismissRequest = { countryExpanded = false }
                     ) {
                         countrySuggestions.forEach { suggestion ->
                             DropdownMenuItem(
                                 text = { Text(suggestion) },
                                 onClick = {
                                     onCountrySuggestionClick(suggestion)
-                                    expanded = false
+                                    countryExpanded = false
                                 }
                             )
                         }
@@ -203,7 +229,9 @@ fun ContactPortraitLayout(
             }
         }
 
-        Column (
+
+        // City
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 16.dp)
@@ -230,9 +258,9 @@ fun ContactPortraitLayout(
                         .wrapContentSize(Alignment.TopStart)
                 ) {
                     TextField(
-                        value = inputCountry,
+                        value = inputCity,
                         onValueChange = {
-                            onCountryChange(it)
+                            onCityChange(it)
                             expanded = true
                         },
                         label = { Text("Ciudad") },
@@ -243,14 +271,14 @@ fun ContactPortraitLayout(
                     )
 
                     ExposedDropdownMenu(
-                        expanded = expanded && countrySuggestions.isNotEmpty(),
+                        expanded = expanded && citySuggestions.isNotEmpty(),
                         onDismissRequest = { expanded = false }
                     ) {
-                        countrySuggestions.forEach { suggestion ->
+                        citySuggestions.forEach { suggestion ->
                             DropdownMenuItem(
                                 text = { Text(suggestion) },
                                 onClick = {
-                                    onCountrySuggestionClick(suggestion)
+                                    onCitySuggestionClick(suggestion)
                                     expanded = false
                                 }
                             )
@@ -289,7 +317,7 @@ fun ContactPortraitLayout(
             }
         }
 
-        Row (
+        Row(
             Modifier
                 .fillMaxWidth(0.85f),
             horizontalArrangement = Arrangement.End,
@@ -300,7 +328,6 @@ fun ContactPortraitLayout(
                 Text("Siguiente")
             }
         }
-
     }
 }
 
