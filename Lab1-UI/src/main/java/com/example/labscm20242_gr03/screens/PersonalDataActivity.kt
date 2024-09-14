@@ -43,7 +43,7 @@ fun PersonalDataActivity(navController: NavController) {
     var fullLastNames by rememberSaveable { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
 
-    val fechaNacimiento = rememberSaveable  { mutableStateOf<String>("") }
+    val fechaNacimiento = rememberSaveable { mutableStateOf<String>("") }
     val openDate = rememberSaveable { mutableStateOf(false) }
 
     var selectedEscolaridad by remember { mutableStateOf("") }
@@ -157,7 +157,11 @@ fun PersonalPortraitLayout(
                     )
                     Spacer(modifier = Modifier.height(5.dp))
                     if (fullNameError.isNotEmpty()) {
-                        Text(text = fullNameError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            text = fullNameError,
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
 
@@ -196,7 +200,11 @@ fun PersonalPortraitLayout(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 if (lastNameError.isNotEmpty()) {
-                    Text(text = lastNameError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = lastNameError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }
@@ -243,23 +251,35 @@ fun PersonalPortraitLayout(
             // TextField para abrir el DatePicker
             Column {
                 TextField(
-                    value = if (fechaNacimiento.value.isNotEmpty()) fechaNacimiento.value else stringResource(id = R.string.seleccionar_fecha),
+                    value = if (fechaNacimiento.value.isNotEmpty()) fechaNacimiento.value else stringResource(
+                        id = R.string.seleccionar_fecha
+                    ),
                     onValueChange = {},
                     readOnly = true, // El campo será de solo lectura
                     label = { Text("Fecha de nacimiento *") },
                     trailingIcon = {
                         IconButton(onClick = { openDate.value = true }) {
-                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Abrir calendario")
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Abrir calendario"
+                            )
                         }
                     },
                     isError = fechaNacimientoError.isNotEmpty()
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 if (fechaNacimientoError.isNotEmpty()) {
-                    Text(text = fechaNacimientoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = fechaNacimientoError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
-            DatePickerDialogInput(openDate = openDate, fechaNacimiento = fechaNacimiento, onErrorChange = { error -> fechaNacimientoError = error })
+            DatePickerDialogInput(
+                openDate = openDate,
+                fechaNacimiento = fechaNacimiento,
+                onErrorChange = { error -> fechaNacimientoError = error })
         }
 
 
@@ -277,7 +297,7 @@ fun PersonalPortraitLayout(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Row (
+        Row(
             Modifier
                 .fillMaxWidth(0.85f),
             horizontalArrangement = Arrangement.End,
@@ -301,7 +321,13 @@ fun PersonalPortraitLayout(
                 }
 
                 if (isValid) {
-                    printPersonalInformation(fullNames, lastNames, selectedGender, fechaNacimiento.value, selectedOption)
+                    printPersonalInformation(
+                        fullNames,
+                        lastNames,
+                        selectedGender,
+                        fechaNacimiento.value,
+                        selectedOption
+                    )
                     navController.navigate(route = AppScreens.ContactDataActivity.route)
                 }
             }) {
@@ -318,7 +344,11 @@ fun PersonalLandscapeLayout() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialogInput(openDate: MutableState<Boolean>, fechaNacimiento: MutableState<String>, onErrorChange: (String) -> Unit) {
+fun DatePickerDialogInput(
+    openDate: MutableState<Boolean>,
+    fechaNacimiento: MutableState<String>,
+    onErrorChange: (String) -> Unit
+) {
     if (openDate.value) {
         val datePickerState = rememberDatePickerState()
         val confirmEnabled = remember {
@@ -326,7 +356,8 @@ fun DatePickerDialogInput(openDate: MutableState<Boolean>, fechaNacimiento: Muta
         }
 
         // Cambia el formato de la fecha para que solo incluya día/mes/año
-        val formatter: SimpleDateFormat = SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+        val formatter: SimpleDateFormat =
+            SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
         formatter.timeZone = TimeZone.getTimeZone("UTC")
 
         DatePickerDialog(
@@ -411,7 +442,13 @@ fun GenericSpinner(
     }
 }
 
-fun printPersonalInformation(fullNames: String, lastNames: String, selectedGender: String?, fechaNacimiento: String, selectedEscolaridad: String?) {
+fun printPersonalInformation(
+    fullNames: String,
+    lastNames: String,
+    selectedGender: String?,
+    fechaNacimiento: String,
+    selectedEscolaridad: String?
+) {
     val genderText = selectedGender ?: "No especificado"
     val escolaridadText = selectedEscolaridad ?: "No especificado"
 
@@ -420,11 +457,11 @@ fun printPersonalInformation(fullNames: String, lastNames: String, selectedGende
         
         Nombre completo: $fullNames $lastNames
         
-        Género: ${if (genderText.isNotEmpty()) genderText else "No especificado"}
+        Género: $genderText
         
         Nació el $fechaNacimiento
         
-        Grado escolar: ${if (escolaridadText.isNotEmpty()) escolaridadText else "No especificado"}
+        Grado escolar: $escolaridadText
     """.trimIndent()
 
     Log.d("PersonalInfo", message)
