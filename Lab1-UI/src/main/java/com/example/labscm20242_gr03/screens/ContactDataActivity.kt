@@ -1,5 +1,6 @@
 package com.example.labscm20242_gr03.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -128,6 +130,10 @@ fun ContactPortraitLayout(
     var expanded by remember { mutableStateOf(false) }
     var countryExpanded by remember { mutableStateOf(false) }
 
+    var emailError by remember { mutableStateOf("") }
+    var phoneError by remember { mutableStateOf("") }
+    var countryError by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -144,12 +150,27 @@ fun ContactPortraitLayout(
                     .padding(end = 6.dp)
                     .size(36.dp)
             )
-            TextField(
-                value = inputPhone,
-                onValueChange = onInputPhoneChanges,
-                label = { Text("Teléfono") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
+            Column {
+                TextField(
+                    value = inputPhone,
+                    onValueChange = {
+                        onInputPhoneChanges(it)
+                        if (it.isEmpty()) {
+                            phoneError = "El teléfono es requerido"
+                        } else {
+                            phoneError = ""
+                        }
+                    },
+                    label = { Text("Teléfono*") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = phoneError.isNotEmpty()
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                if (phoneError.isNotEmpty()) {
+                    Text(text = phoneError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+
         }
 
         Row(
@@ -163,34 +184,48 @@ fun ContactPortraitLayout(
                     .padding(end = 6.dp)
                     .size(36.dp)
             )
-            TextField(
-                value = inputEmail,
-                onValueChange = onInputEmailChanges,
-                label = { Text("Correo") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
+            Column {
+                TextField(
+                    value = inputEmail,
+                    onValueChange = {
+                        onInputEmailChanges(it)
+                        if (it.isEmpty()) {
+                            emailError = "El correo es requerido"
+                        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()) {
+                            emailError = "Correo inválido"
+                        } else {
+                            emailError = ""
+                        }
+                    },
+                    label = { Text("Correo*") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    isError = emailError.isNotEmpty()
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                if (emailError.isNotEmpty()) {
+                    Text(text = emailError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                }
+
+            }
         }
 
         // Country
-        Column(
+        // Country
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 16.dp)
+                .padding(bottom = 20.dp)
+                .padding(end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
+            Icon(
+                Icons.Rounded.LocationOn,
+                contentDescription = "Location icon",
                 modifier = Modifier
-                    .padding(bottom = 20.dp)
-                    .padding(end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Rounded.LocationOn,
-                    contentDescription = "Country icon",
-                    modifier = Modifier
-                        .padding(end = 6.dp)
-                        .size(36.dp)
-                )
+                    .padding(end = 6.dp)
+                    .size(36.dp)
+            )
 
+            Column {
                 ExposedDropdownMenuBox(
                     expanded = countryExpanded,
                     onExpandedChange = { countryExpanded = !countryExpanded },
@@ -203,14 +238,22 @@ fun ContactPortraitLayout(
                         onValueChange = {
                             onCountryChange(it)
                             countryExpanded = true
+                            if (it.isEmpty()) {
+                                countryError = "El país es requerido"
+                            } else {
+                                countryError = ""
+                            }
                         },
-                        label = { Text("País") },
+                        label = { Text("País *") },  // Indica que es obligatorio
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor()
+                            .padding(end = 16.dp),
+                        isError = countryError.isNotEmpty()  // Indica si hay error
                     )
 
+                    // Mostrar las sugerencias de países
                     ExposedDropdownMenu(
                         expanded = countryExpanded && countrySuggestions.isNotEmpty(),
                         onDismissRequest = { countryExpanded = false }
@@ -221,13 +264,26 @@ fun ContactPortraitLayout(
                                 onClick = {
                                     onCountrySuggestionClick(suggestion)
                                     countryExpanded = false
+                                    countryError = ""  // Limpiar el error al seleccionar un país
                                 }
                             )
                         }
                     }
                 }
+
+                // Mostrar el mensaje de error debajo del input
+                Spacer(modifier = Modifier.height(5.dp))
+                if (countryError.isNotEmpty()) {
+                    Text(
+                        text = countryError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
         }
+
+
 
 
         // City
@@ -323,7 +379,30 @@ fun ContactPortraitLayout(
             horizontalArrangement = Arrangement.End,
         ) {
             Button(onClick = {
-                navController.navigate(route = AppScreens.PersonalDataActivity.route)
+                var isValid = true
+
+                if (inputPhone.isEmpty()) {
+                    phoneError = "El teléfono es requerido"
+                    isValid = false
+                }
+
+                if (inputEmail.isEmpty()) {
+                    emailError = "El correo es requerido"
+                    isValid = false
+                } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(inputEmail).matches()) {
+                    emailError = "Correo inválido"
+                    isValid = false
+                }
+
+                if (inputCountry.isEmpty()) {
+                    countryError = "El país es requerido"
+                    isValid = false
+                }
+
+                if (isValid) {
+                    printContactInformation(inputPhone, inputEmail, inputCountry, inputCity, inputAddress)
+                    navController.navigate(route = AppScreens.PersonalDataActivity.route)
+                }
             }) {
                 Text("Siguiente")
             }
@@ -335,3 +414,32 @@ fun ContactPortraitLayout(
 fun ContactLandscapeLayout() {
     Text("Hola landscape")
 }
+
+fun printContactInformation(
+    phone: String,
+    email: String,
+    country: String,
+    city: String,
+    address: String
+) {
+    val countryText = if (country.isNotEmpty()) country else "No especificado"
+    val cityText = if (city.isNotEmpty()) city else "No especificado"
+    val addressText = if (address.isNotEmpty()) address else "No especificado"
+
+    val message = """
+        Información de contacto:
+
+        Teléfono: ${if (phone.isNotEmpty()) phone else "No especificado"}
+
+        Correo electrónico: ${if (email.isNotEmpty()) email else "No especificado"}
+
+        País: $countryText
+
+        Ciudad: $cityText
+
+        Dirección: $addressText
+    """.trimIndent()
+
+    Log.d("ContactInfo", message)
+}
+
