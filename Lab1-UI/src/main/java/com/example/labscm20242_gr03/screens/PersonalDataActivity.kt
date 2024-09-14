@@ -3,6 +3,7 @@ package com.example.labscm20242_gr03.screens
 import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -45,6 +46,8 @@ fun PersonalDataActivity(navController: NavController) {
     val fechaNacimiento = rememberSaveable  { mutableStateOf<String>("") }
     val openDate = rememberSaveable { mutableStateOf(false) }
 
+    var selectedEscolaridad by remember { mutableStateOf("") }
+
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
@@ -76,7 +79,9 @@ fun PersonalDataActivity(navController: NavController) {
                     onGenderChange = { selectedGender = it },
                     navController = navController,
                     openDate = openDate,
-                    fechaNacimiento = fechaNacimiento
+                    fechaNacimiento = fechaNacimiento,
+                    selectedOption = selectedEscolaridad,
+                    onOptionSelected = { selectedEscolaridad = it }
                 )
             } else {
                 PersonalLandscapeLayout()
@@ -95,7 +100,9 @@ fun PersonalPortraitLayout(
     onGenderChange: (String) -> Unit,
     navController: NavController,
     openDate: MutableState<Boolean>,
-    fechaNacimiento: MutableState<String>
+    fechaNacimiento: MutableState<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
 ) {
 
     // Estados para los mensajes de error
@@ -260,7 +267,12 @@ fun PersonalPortraitLayout(
 
         // Escolaridad
         Row {
-            EscolaridadSpinner()
+            GenericSpinner(
+                label = "Escolaridad",
+                options = listOf("Primaria", "Secundaria", "Preparatoria", "Universidad"),
+                selectedOption = selectedOption,
+                onOptionSelected = onOptionSelected
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -289,6 +301,7 @@ fun PersonalPortraitLayout(
                 }
 
                 if (isValid) {
+                    printPersonalInformation(fullNames, lastNames, selectedGender, fechaNacimiento.value, selectedOption)
                     navController.navigate(route = AppScreens.ContactDataActivity.route)
                 }
             }) {
@@ -314,6 +327,7 @@ fun DatePickerDialogInput(openDate: MutableState<Boolean>, fechaNacimiento: Muta
 
         // Cambia el formato de la fecha para que solo incluya día/mes/año
         val formatter: SimpleDateFormat = SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
 
         DatePickerDialog(
             onDismissRequest = {
@@ -342,16 +356,17 @@ fun DatePickerDialogInput(openDate: MutableState<Boolean>, fechaNacimiento: Muta
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EscolaridadSpinner() {
-    val escolaridadOptions = listOf("Primaria", "Secundaria", "Pregrado", "Posgrado", "Doctorado", "Maestría")
+fun GenericSpinner(
+    label: String,
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedEscolaridad by remember { mutableStateOf("") }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = {
-            expanded = !expanded
-        }
+        onExpandedChange = { expanded = !expanded }
     ) {
         Row(
             modifier = Modifier.padding(bottom = 20.dp),
@@ -359,16 +374,16 @@ fun EscolaridadSpinner() {
         ) {
             Icon(
                 Icons.Default.Star,
-                contentDescription = "Person icon",
+                contentDescription = "Dropdown icon",
                 modifier = Modifier
                     .padding(end = 6.dp)
                     .size(36.dp)
             )
             TextField(
                 readOnly = true,
-                value = selectedEscolaridad,
+                value = selectedOption,
                 onValueChange = {},
-                label = { Text("Grado de Escolaridad") },
+                label = { Text(label) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(
                         expanded = expanded
@@ -383,15 +398,34 @@ fun EscolaridadSpinner() {
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            escolaridadOptions.forEach { escolaridad ->
+            options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(escolaridad) },
+                    text = { Text(option) },
                     onClick = {
-                        selectedEscolaridad = escolaridad
+                        onOptionSelected(option)
                         expanded = false
                     }
                 )
             }
         }
     }
+}
+
+fun printPersonalInformation(fullNames: String, lastNames: String, selectedGender: String?, fechaNacimiento: String, selectedEscolaridad: String?) {
+    val genderText = selectedGender ?: "No especificado"
+    val escolaridadText = selectedEscolaridad ?: "No especificado"
+
+    val message = """
+        Información personal: 
+        
+        Nombre completo: $fullNames $lastNames
+        
+        Género: ${if (genderText.isNotEmpty()) genderText else "No especificado"}
+        
+        Nació el $fechaNacimiento
+        
+        Grado escolar: ${if (escolaridadText.isNotEmpty()) escolaridadText else "No especificado"}
+    """.trimIndent()
+
+    Log.d("PersonalInfo", message)
 }
