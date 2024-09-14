@@ -5,6 +5,7 @@ import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.List
@@ -84,7 +85,19 @@ fun PersonalDataActivity(navController: NavController) {
                     onOptionSelected = { selectedEscolaridad = it }
                 )
             } else {
-                PersonalLandscapeLayout()
+                PersonalLandscapeLayout(
+                    fullNames = fullNames,
+                    onFullNameHandleChange = { fullNames = it },
+                    lastNames = fullLastNames,
+                    onLastNameHandleChange = { fullLastNames = it },
+                    selectedGender = selectedGender,
+                    onGenderChange = { selectedGender = it },
+                    navController = navController,
+                    openDate = openDate,
+                    fechaNacimiento = fechaNacimiento,
+                    selectedOption = selectedEscolaridad,
+                    onOptionSelected = { selectedEscolaridad = it }
+                )
             }
         }
     }
@@ -338,8 +351,235 @@ fun PersonalPortraitLayout(
 }
 
 @Composable
-fun PersonalLandscapeLayout() {
-    Text("Hola mundo landscape!!")
+fun PersonalLandscapeLayout(
+    fullNames: String,
+    onFullNameHandleChange: (String) -> Unit,
+    lastNames: String,
+    onLastNameHandleChange: (String) -> Unit,
+    selectedGender: String,
+    onGenderChange: (String) -> Unit,
+    navController: NavController,
+    openDate: MutableState<Boolean>,
+    fechaNacimiento: MutableState<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
+) {
+    // Estados para los mensajes de error
+    var fullNameError by remember { mutableStateOf("") }
+    var lastNameError by remember { mutableStateOf("") }
+    var fechaNacimientoError by remember { mutableStateOf("") }
+
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+        item {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.padding(bottom = 20.dp).weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Rounded.Person,
+                        contentDescription = "Person icon",
+                        modifier = Modifier
+                            .padding(end = 6.dp)
+                            .size(36.dp)
+                    )
+                    Column {
+                        TextField(
+                            value = fullNames,
+                            onValueChange = {
+                                onFullNameHandleChange(it)
+                                if (it.isEmpty()) {
+                                    fullNameError = "Campo obligatorio"
+                                } else {
+                                    fullNameError = ""
+                                }
+                            },
+                            label = { Text("Nombres *") },
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            singleLine = true,
+                            isError = fullNameError.isNotEmpty(),
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        if (fullNameError.isNotEmpty()) {
+                            Text(
+                                text = fullNameError,
+                                color = Color.Red,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        Icons.Rounded.Person,
+                        contentDescription = "Person icon",
+                        modifier = Modifier
+                            .padding(end = 6.dp)
+                            .size(36.dp)
+                    )
+                    Column {
+                        TextField(
+                            value = lastNames,
+                            onValueChange = {
+                                onLastNameHandleChange(it)
+                                if (it.isEmpty()) {
+                                    lastNameError = "Campo obligatorio"
+                                } else {
+                                    lastNameError = ""
+                                }
+                            },
+                            label = { Text("Apellidos *") },
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                                keyboardType = KeyboardType.Text
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            isError = lastNameError.isNotEmpty(),
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        if (lastNameError.isNotEmpty()) {
+                            Text(
+                                text = lastNameError,
+                                color = Color.Red,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Rounded.Info,
+                    contentDescription = "Person icon",
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .size(36.dp)
+                )
+                Text("Sexo:")
+                RadioButton(
+                    selected = selectedGender == "Hombre",
+                    onClick = { onGenderChange("Hombre") }
+                )
+                Text("Hombre")
+                RadioButton(
+                    selected = selectedGender == "Mujer",
+                    onClick = { onGenderChange("Mujer") }
+                )
+                Text("Mujer")
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            // Fecha de nacimiento
+            Row(
+                modifier = Modifier.padding(bottom = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Rounded.DateRange,
+                    contentDescription = "Person icon",
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .size(36.dp)
+                )
+                // TextField para abrir el DatePicker
+                Column {
+                    TextField(
+                        value = if (fechaNacimiento.value.isNotEmpty()) fechaNacimiento.value else stringResource(
+                            id = R.string.seleccionar_fecha
+                        ),
+                        onValueChange = {},
+                        readOnly = true, // El campo será de solo lectura
+                        label = { Text("Fecha de nacimiento *") },
+                        trailingIcon = {
+                            IconButton(onClick = { openDate.value = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.DateRange,
+                                    contentDescription = "Abrir calendario"
+                                )
+                            }
+                        },
+                        isError = fechaNacimientoError.isNotEmpty()
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    if (fechaNacimientoError.isNotEmpty()) {
+                        Text(
+                            text = fechaNacimientoError,
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+                DatePickerDialogInput(
+                    openDate = openDate,
+                    fechaNacimiento = fechaNacimiento,
+                    onErrorChange = { error -> fechaNacimientoError = error })
+            }
+
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Escolaridad
+            Row {
+                GenericSpinner(
+                    label = "Escolaridad",
+                    options = listOf("Primaria", "Secundaria", "Preparatoria", "Universidad"),
+                    selectedOption = selectedOption,
+                    onOptionSelected = onOptionSelected
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                Modifier
+                    .fillMaxWidth(0.85f),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                Button(onClick = {
+                    var isValid = true
+
+                    if (fullNames.isEmpty()) {
+                        fullNameError = "El campo nombres es requerido"
+                        isValid = false
+                    }
+
+                    if (lastNames.isEmpty()) {
+                        lastNameError = "El campo apellidos es requerido"
+                        isValid = false
+                    }
+
+                    if (fechaNacimiento.value.isEmpty()) {
+                        fechaNacimientoError = "La fecha de nacimiento es requerida"
+                        isValid = false
+                    }
+
+                    if (isValid) {
+                        printPersonalInformation(
+                            fullNames,
+                            lastNames,
+                            selectedGender,
+                            fechaNacimiento.value,
+                            selectedOption
+                        )
+                        navController.navigate(route = AppScreens.ContactDataActivity.route)
+                    }
+                }) {
+                    Text("Siguiente")
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
