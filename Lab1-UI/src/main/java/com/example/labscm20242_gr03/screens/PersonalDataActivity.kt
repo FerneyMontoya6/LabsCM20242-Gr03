@@ -60,7 +60,7 @@ fun PersonalDataActivity(navController: NavController) {
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text("Información Personal")
+                    Text(stringResource(id = R.string.top_bar_personal))
                 }
             )
         }
@@ -123,6 +123,15 @@ fun PersonalPortraitLayout(
     var lastNameError by remember { mutableStateOf("") }
     var fechaNacimientoError by remember { mutableStateOf("") }
 
+    // Strings
+    val campoNombreRequerido = stringResource(id = R.string.nombre_requerido)
+    val campoApellidoRequerido = stringResource(id = R.string.apellido_requerido)
+    val campoFechaNacimientoRequerido = stringResource(id = R.string.fecha_nacimiento_requerida)
+    val campoObligatorio = stringResource(id = R.string.camplo_obligatorio)
+    val hombre = stringResource(id = R.string.hombre)
+    val mujer = stringResource(id = R.string.mujer)
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,7 +145,7 @@ fun PersonalPortraitLayout(
                     .padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.Start,
             ) {
-                Text("Nombres")
+                Text(stringResource(id = R.string.nombre))
             }
             Row(
                 modifier = Modifier.padding(bottom = 20.dp),
@@ -155,12 +164,12 @@ fun PersonalPortraitLayout(
                         onValueChange = {
                             onFullNameHandleChange(it)
                             if (it.isEmpty()) {
-                                fullNameError = "Campo obligatorio"
+                                fullNameError = campoObligatorio
                             } else {
                                 fullNameError = ""
                             }
                         },
-                        label = { Text("Nombres *") },
+                        label = { Text(stringResource(id = R.string.nombres)) },
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Words,
                             keyboardType = KeyboardType.Text
@@ -171,7 +180,7 @@ fun PersonalPortraitLayout(
                     Spacer(modifier = Modifier.height(5.dp))
                     if (fullNameError.isNotEmpty()) {
                         Text(
-                            text = fullNameError,
+                            text = stringResource(id = R.string.camplo_obligatorio),
                             color = Color.Red,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -198,12 +207,12 @@ fun PersonalPortraitLayout(
                     onValueChange = {
                         onLastNameHandleChange(it)
                         if (it.isEmpty()) {
-                            lastNameError = "Campo obligatorio"
+                            lastNameError = campoObligatorio
                         } else {
                             lastNameError = ""
                         }
                     },
-                    label = { Text("Apellidos *") },
+                    label = { Text(stringResource(id = R.string.apellidos)) },
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Words,
                         keyboardType = KeyboardType.Text
@@ -214,7 +223,7 @@ fun PersonalPortraitLayout(
                 Spacer(modifier = Modifier.height(5.dp))
                 if (lastNameError.isNotEmpty()) {
                     Text(
-                        text = lastNameError,
+                        text = stringResource(id = R.string.camplo_obligatorio),
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -234,17 +243,17 @@ fun PersonalPortraitLayout(
                     .padding(end = 6.dp)
                     .size(36.dp)
             )
-            Text("Sexo:")
+            Text(stringResource(id = R.string.sexo))
             RadioButton(
-                selected = selectedGender == "Hombre",
-                onClick = { onGenderChange("Hombre") }
+                selected = selectedGender == hombre,
+                onClick = { onGenderChange(hombre) }
             )
-            Text("Hombre")
+            Text(stringResource(id = R.string.hombre))
             RadioButton(
-                selected = selectedGender == "Mujer",
-                onClick = { onGenderChange("Mujer") }
+                selected = selectedGender == mujer,
+                onClick = { onGenderChange(mujer) }
             )
-            Text("Mujer")
+            Text(stringResource(id = R.string.mujer))
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -269,12 +278,12 @@ fun PersonalPortraitLayout(
                     ),
                     onValueChange = {},
                     readOnly = true, // El campo será de solo lectura
-                    label = { Text("Fecha de nacimiento *") },
+                    label = { Text(stringResource(id = R.string.fecha_de_nacimiento)) },
                     trailingIcon = {
                         IconButton(onClick = { openDate.value = true }) {
                             Icon(
                                 imageVector = Icons.Default.DateRange,
-                                contentDescription = "Abrir calendario"
+                                contentDescription = stringResource(id = R.string.abrir_calendario)
                             )
                         }
                     },
@@ -301,8 +310,13 @@ fun PersonalPortraitLayout(
         // Escolaridad
         Row {
             GenericSpinner(
-                label = "Escolaridad",
-                options = listOf("Primaria", "Secundaria", "Preparatoria", "Universidad"),
+                label = stringResource(R.string.escolaridad),
+                options = listOf(
+                    stringResource(id = R.string.primaria),
+                    stringResource(id = R.string.secundaria),
+                    stringResource(id = R.string.preparatoria),
+                    stringResource(id = R.string.universidad),
+                ),
                 selectedOption = selectedOption,
                 onOptionSelected = onOptionSelected
             )
@@ -319,17 +333,17 @@ fun PersonalPortraitLayout(
                 var isValid = true
 
                 if (fullNames.isEmpty()) {
-                    fullNameError = "El campo nombres es requerido"
+                    fullNameError = campoNombreRequerido
                     isValid = false
                 }
 
                 if (lastNames.isEmpty()) {
-                    lastNameError = "El campo apellidos es requerido"
+                    lastNameError = campoApellidoRequerido
                     isValid = false
                 }
 
                 if (fechaNacimiento.value.isEmpty()) {
-                    fechaNacimientoError = "La fecha de nacimiento es requerida"
+                    fechaNacimientoError = campoFechaNacimientoRequerido
                     isValid = false
                 }
 
@@ -344,7 +358,7 @@ fun PersonalPortraitLayout(
                     navController.navigate(route = AppScreens.ContactDataActivity.route)
                 }
             }) {
-                Text("Siguiente")
+                Text(stringResource(id = R.string.siguiente))
             }
         }
     }
@@ -369,6 +383,14 @@ fun PersonalLandscapeLayout(
     var lastNameError by remember { mutableStateOf("") }
     var fechaNacimientoError by remember { mutableStateOf("") }
 
+    // Strings
+    val campoObligatorio = stringResource(id = R.string.camplo_obligatorio)
+    val hombre = stringResource(id = R.string.hombre)
+    val mujer = stringResource(id = R.string.mujer)
+    val campoNombreRequerido = stringResource(id = R.string.nombre_requerido)
+    val campoApellidoRequerido = stringResource(id = R.string.apellido_requerido)
+    val campoFechaNacimientoRequerido = stringResource(id = R.string.fecha_nacimiento_requerida)
+
     LazyColumn(modifier = Modifier.fillMaxSize().padding(20.dp)) {
         item {
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -389,12 +411,12 @@ fun PersonalLandscapeLayout(
                             onValueChange = {
                                 onFullNameHandleChange(it)
                                 if (it.isEmpty()) {
-                                    fullNameError = "Campo obligatorio"
+                                    fullNameError = campoObligatorio
                                 } else {
                                     fullNameError = ""
                                 }
                             },
-                            label = { Text("Nombres *") },
+                            label = { Text(stringResource(id = R.string.nombres)) },
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Words,
@@ -431,12 +453,12 @@ fun PersonalLandscapeLayout(
                             onValueChange = {
                                 onLastNameHandleChange(it)
                                 if (it.isEmpty()) {
-                                    lastNameError = "Campo obligatorio"
+                                    lastNameError = campoObligatorio
                                 } else {
                                     lastNameError = ""
                                 }
                             },
-                            label = { Text("Apellidos *") },
+                            label = { Text(stringResource(id = R.string.apellidos)) },
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Words,
                                 keyboardType = KeyboardType.Text
@@ -467,17 +489,17 @@ fun PersonalLandscapeLayout(
                         .padding(end = 6.dp)
                         .size(36.dp)
                 )
-                Text("Sexo:")
+                Text(stringResource(id = R.string.sexo))
                 RadioButton(
-                    selected = selectedGender == "Hombre",
-                    onClick = { onGenderChange("Hombre") }
+                    selected = selectedGender == hombre,
+                    onClick = { onGenderChange(hombre) }
                 )
-                Text("Hombre")
+                Text(hombre)
                 RadioButton(
-                    selected = selectedGender == "Mujer",
-                    onClick = { onGenderChange("Mujer") }
+                    selected = selectedGender == mujer,
+                    onClick = { onGenderChange(mujer) }
                 )
-                Text("Mujer")
+                Text(mujer)
             }
             Spacer(modifier = Modifier.height(20.dp))
             // Fecha de nacimiento
@@ -500,12 +522,12 @@ fun PersonalLandscapeLayout(
                         ),
                         onValueChange = {},
                         readOnly = true, // El campo será de solo lectura
-                        label = { Text("Fecha de nacimiento *") },
+                        label = { Text(stringResource(id = R.string.fecha_de_nacimiento)) },
                         trailingIcon = {
                             IconButton(onClick = { openDate.value = true }) {
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
-                                    contentDescription = "Abrir calendario"
+                                    contentDescription = stringResource(id = R.string.seleccionar_fecha)
                                 )
                             }
                         },
@@ -532,8 +554,13 @@ fun PersonalLandscapeLayout(
             // Escolaridad
             Row {
                 GenericSpinner(
-                    label = "Escolaridad",
-                    options = listOf("Primaria", "Secundaria", "Preparatoria", "Universidad"),
+                    label = stringResource(id = R.string.escolaridad),
+                    options = listOf(
+                        stringResource(id = R.string.primaria),
+                        stringResource(id = R.string.secundaria),
+                        stringResource(id = R.string.preparatoria),
+                        stringResource(id = R.string.universidad),
+                    ),
                     selectedOption = selectedOption,
                     onOptionSelected = onOptionSelected
                 )
@@ -550,17 +577,17 @@ fun PersonalLandscapeLayout(
                     var isValid = true
 
                     if (fullNames.isEmpty()) {
-                        fullNameError = "El campo nombres es requerido"
+                        fullNameError = campoNombreRequerido
                         isValid = false
                     }
 
                     if (lastNames.isEmpty()) {
-                        lastNameError = "El campo apellidos es requerido"
+                        lastNameError = campoApellidoRequerido
                         isValid = false
                     }
 
                     if (fechaNacimiento.value.isEmpty()) {
-                        fechaNacimientoError = "La fecha de nacimiento es requerida"
+                        fechaNacimientoError = campoFechaNacimientoRequerido
                         isValid = false
                     }
 
@@ -575,7 +602,7 @@ fun PersonalLandscapeLayout(
                         navController.navigate(route = AppScreens.ContactDataActivity.route)
                     }
                 }) {
-                    Text("Siguiente")
+                    Text(stringResource(id = R.string.siguiente))
                 }
             }
         }
@@ -617,7 +644,7 @@ fun DatePickerDialogInput(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { openDate.value = false }) { Text("Cancelar") }
+                TextButton(onClick = { openDate.value = false }) { Text(stringResource(id = R.string.cancelar)) }
             }
         ) {
             DatePicker(state = datePickerState)

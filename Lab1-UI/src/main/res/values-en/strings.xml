@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LabsCM20242-Gr03</string>
+    <string name="top_bar_personal">Personal Information</string>
+    <string name="seleccionar_fecha">Enter a date</string>
+    <string name="nombre">Name</string>
+    <string name="nombres">First Names *</string>
+    <string name="apellidos">Last Names *</string>
+    <string name="camplo_obligatorio">Required field</string>
+    <string name="sexo">Gender:</string>
+    <string name="hombre">Male</string>
+    <string name="mujer">Female</string>
+    <string name="fecha_de_nacimiento">Date of Birth *</string>
+    <string name="abrir_calendario">Open calendar</string>
+    <string name="escolaridad">Education</string>
+    <string name="primaria">Primary School</string>
+    <string name="secundaria">Secondary School</string>
+    <string name="preparatoria">High School</string>
+    <string name="universidad">University</string>
+    <string name="nombre_requerido">The first names field is required</string>
+    <string name="apellido_requerido">The last names field is required</string>
+    <string name="fecha_nacimiento_requerida">Date of birth is required</string>
+    <string name="siguiente">Next</string>
+    <string name="cancelar">Cancel</string>
+    <string name="informacion_de_contacto">Contact Information</string>
+    <string name="telefono_requerido">Phone number is required</string>
+    <string name="telefono">Phone*</string>
+    <string name="correo_requerido">Email is required</string>
+    <string name="correo_invalido">Invalid email</string>
+    <string name="correo">Email*</string>
+    <string name="pais_requerido">Country is required</string>
+    <string name="pais">Country*</string>
+    <string name="ciudad">City</string>
+    <string name="direccion">Address</string>
+    <string name="carrera">Career 51</string>
+</resources>

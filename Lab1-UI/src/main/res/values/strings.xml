@@ -1,4 +1,35 @@
 <resources>
     <string name="app_name">LabsCM20242-Gr03</string>
+    <string name="top_bar_personal">Información Personal</string>
     <string name="seleccionar_fecha">Ingresa una fecha</string>
+    <string name="nombre">Nombre</string>
+    <string name="nombres">Nombres *</string>
+    <string name="apellidos">Apellidos *</string>
+    <string name="camplo_obligatorio">Campo obligatorio</string>
+    <string name="sexo">Sexo:</string>
+    <string name="hombre">Hombre</string>
+    <string name="mujer">Mujer</string>
+    <string name="fecha_de_nacimiento">Fecha de nacimiento *</string>
+    <string name="abrir_calendario">Arbir calendario</string>
+    <string name="escolaridad">Escolaridad</string>
+    <string name="primaria">Primaria</string>
+    <string name="secundaria">Secundaria</string>
+    <string name="preparatoria">Preparatoria</string>
+    <string name="universidad">Universidad</string>
+    <string name="nombre_requerido">El campo nombres es requerido</string>
+    <string name="apellido_requerido">El campo apellidos es requerido</string>
+    <string name="fecha_nacimiento_requerida">La fecha de nacimiento es requerida</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="informacion_de_contacto">Información de Contacto</string>
+    <string name="telefono_requerido">El teléfono es requerido</string>
+    <string name="telefono">Teléfono*</string>
+    <string name="correo_requerido">El correo es requerido</string>
+    <string name="correo_invalido">Correo inválido</string>
+    <string name="correo">Correo*</string>
+    <string name="pais_requerido">El país es requerido</string>
+    <string name="pais">Pais*</string>
+    <string name="ciudad">Ciudad</string>
+    <string name="direccion">Dirección</string>
+    <string name="carrera">Carrera 51</string>
 </resources>
