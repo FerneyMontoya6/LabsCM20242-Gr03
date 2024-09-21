@@ -479,98 +479,99 @@ fun PersonalLandscapeLayout(
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Rounded.Info,
-                    contentDescription = "Person icon",
-                    modifier = Modifier
-                        .padding(end = 6.dp)
-                        .size(36.dp)
-                )
-                Text(stringResource(id = R.string.sexo))
-                RadioButton(
-                    selected = selectedGender == hombre,
-                    onClick = { onGenderChange(hombre) }
-                )
-                Text(hombre)
-                RadioButton(
-                    selected = selectedGender == mujer,
-                    onClick = { onGenderChange(mujer) }
-                )
-                Text(mujer)
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            // Fecha de nacimiento
-            Row(
-                modifier = Modifier.padding(bottom = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Rounded.DateRange,
-                    contentDescription = "Person icon",
-                    modifier = Modifier
-                        .padding(end = 6.dp)
-                        .size(36.dp)
-                )
-                // TextField para abrir el DatePicker
-                Column {
-                    TextField(
-                        value = if (fechaNacimiento.value.isNotEmpty()) fechaNacimiento.value else stringResource(
-                            id = R.string.seleccionar_fecha
-                        ),
-                        onValueChange = {},
-                        readOnly = true, // El campo será de solo lectura
-                        label = { Text(stringResource(id = R.string.fecha_de_nacimiento)) },
-                        trailingIcon = {
-                            IconButton(onClick = { openDate.value = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.DateRange,
-                                    contentDescription = stringResource(id = R.string.seleccionar_fecha)
-                                )
-                            }
-                        },
-                        isError = fechaNacimientoError.isNotEmpty()
-                    )
-                    Spacer(modifier = Modifier.height(5.dp))
-                    if (fechaNacimientoError.isNotEmpty()) {
-                        Text(
-                            text = fechaNacimientoError,
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-                DatePickerDialogInput(
-                    openDate = openDate,
-                    fechaNacimiento = fechaNacimiento,
-                    onErrorChange = { error -> fechaNacimientoError = error })
-            }
+          Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+              ) {
+                  Icon(
+                      Icons.Rounded.Info,
+                      contentDescription = "Person icon",
+                      modifier = Modifier
+                          .padding(end = 6.dp)
+                          .size(36.dp)
+                  )
+                  Text(stringResource(id = R.string.sexo))
+                  RadioButton(
+                      selected = selectedGender == hombre,
+                      onClick = { onGenderChange(hombre) }
+                  )
+                  Text(hombre)
+                  RadioButton(
+                      selected = selectedGender == mujer,
+                      onClick = { onGenderChange(mujer) }
+                  )
+                  Text(mujer)
+              }
 
+              Spacer(modifier = Modifier.height(20.dp))
+              // Fecha de nacimiento
+              Row(
+                  modifier = Modifier.padding(bottom = 20.dp),
+                  verticalAlignment = Alignment.CenterVertically
+              ) {
+                  Icon(
+                      Icons.Rounded.DateRange,
+                      contentDescription = "Person icon",
+                      modifier = Modifier
+                          .padding(end = 6.dp)
+                          .size(36.dp)
+                  )
+                  // TextField para abrir el DatePicker
+                  Column {
+                      TextField(
+                          value = if (fechaNacimiento.value.isNotEmpty()) fechaNacimiento.value else stringResource(
+                              id = R.string.seleccionar_fecha
+                          ),
+                          onValueChange = {},
+                          readOnly = true, // El campo será de solo lectura
+                          label = { Text(stringResource(id = R.string.fecha_de_nacimiento)) },
+                          trailingIcon = {
+                              IconButton(onClick = { openDate.value = true }) {
+                                  Icon(
+                                      imageVector = Icons.Default.DateRange,
+                                      contentDescription = stringResource(id = R.string.seleccionar_fecha)
+                                  )
+                              }
+                          },
+                          isError = fechaNacimientoError.isNotEmpty()
+                      )
+                      Spacer(modifier = Modifier.height(5.dp))
+                      if (fechaNacimientoError.isNotEmpty()) {
+                          Text(
+                              text = fechaNacimientoError,
+                              color = Color.Red,
+                              style = MaterialTheme.typography.bodySmall
+                          )
+                      }
+                  }
+                  DatePickerDialogInput(
+                      openDate = openDate,
+                      fechaNacimiento = fechaNacimiento,
+                      onErrorChange = { error -> fechaNacimientoError = error })
+              }
 
-            Spacer(modifier = Modifier.height(20.dp))
+          }
+              Spacer(modifier = Modifier.height(20.dp))
 
-            // Escolaridad
-            Row {
-                GenericSpinner(
-                    label = stringResource(id = R.string.escolaridad),
-                    options = listOf(
-                        stringResource(id = R.string.primaria),
-                        stringResource(id = R.string.secundaria),
-                        stringResource(id = R.string.preparatoria),
-                        stringResource(id = R.string.universidad),
-                    ),
-                    selectedOption = selectedOption,
-                    onOptionSelected = onOptionSelected
-                )
-            }
+              // Escolaridad
+              Row {
+                  GenericSpinner(
+                      label = stringResource(id = R.string.escolaridad),
+                      options = listOf(
+                          stringResource(id = R.string.primaria),
+                          stringResource(id = R.string.secundaria),
+                          stringResource(id = R.string.preparatoria),
+                          stringResource(id = R.string.universidad),
+                      ),
+                      selectedOption = selectedOption,
+                      onOptionSelected = onOptionSelected
+                  )
+              }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
+              Spacer(modifier = Modifier.height(20.dp))
             Row(
                 Modifier
-                    .fillMaxWidth(0.85f),
+                    .fillMaxWidth(0.95f),
                 horizontalArrangement = Arrangement.End,
             ) {
                 Button(onClick = {
